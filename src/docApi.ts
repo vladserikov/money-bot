@@ -22,20 +22,21 @@ export const updateCell = async (columnName: string, newValue: string) => {
     const rows = await sheet.getRows();
     let lastRow = rows[rows.length - 1];
 
-    const cellValue = lastRow.get(columnName);
-
-    const currentValue = cellValue ? `${Number(cellValue) + Number(newValue)}` : newValue;
-
     if (currentDate === lastRow?.get('Категория')) {
+        const cellValue = lastRow.get(columnName);
+        const currentValue = cellValue ? `${Number(cellValue) + Number(newValue)}` : newValue;
         lastRow.set(columnName, currentValue);
         await lastRow.save();
+
+        return { currentValue, newValue };
     } else {
         const newRow: Record<string, any> = {};
         newRow['Категория'] = currentDate;
-        newRow[columnName] = currentValue;
+        newRow[columnName] = newValue;
         await sheet.addRow(newRow);
+
+        return { currentValue: newValue, newValue };
     }
-    return { currentValue, newValue };
 };
 
 export default doc;
