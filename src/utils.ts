@@ -1,45 +1,50 @@
-import auth from './authentification';
-import sheets from './sheetsApi';
-
-const spreadsheetId = '1jKBMJOg1UMIvOG1Toiw95S8nsEkq8HNzm9eJdeDBVSA';
+import { Markup } from 'telegraf';
+import { getSheet } from './docApi';
 
 export type ButtonCategory = {
     text: string;
     action: string;
 };
 
-const getCategory = async () => {
-    const range = 'Лист1!A1:Z1'; // Замените на желаемый диапазон.
+export const getCategory = async () => {
+    const sheet = await getSheet();
+    await sheet.loadHeaderRow();
 
-    try {
-        const response = await sheets.spreadsheets.values.get({
-            auth,
-            spreadsheetId,
-            range,
-        });
-        const values = response.data.values as string[][];
-        return values[0];
-    } catch (error) {
-        console.error(error);
-    }
-    return [];
+    return sheet.headerValues;
 };
 
 export const getButtonsCategory = async () => {
-    const values = await getCategory();
+    const categories = await getCategory();
     let listButtons: ButtonCategory[][] = [];
     const keyboardLength = 3;
     const startColumn = 1;
-    const countRows = Math.ceil((values.length - startColumn) / keyboardLength);
+    const countRows = Math.ceil((categories.length - startColumn) / keyboardLength);
 
     for (let i = 0, k = startColumn; i < countRows; i++) {
-        const rowButton: ButtonCategory[] = [];
+        const rowButtons: ButtonCategory[] = [];
         for (let j = 0; j < keyboardLength; j++, k++) {
-            if (!values[k]) break;
-            rowButton.push({ action: `add_category_${k}`, text: values[k] });
+            if (!categories[k]) break;
+            rowButtons.push({ action: `expense_${k}`, text: categories[k] });
         }
-        listButtons.push(rowButton);
+        listButtons.push(rowButtons);
     }
 
-    return { listButtons, categories: values };
+    return { listButtons, categories };
+};
+
+export const getLetterByNumber = (num: number) => {
+    if (num >= 1 && num <= 26) {
+        // ASCII код буквы 'A' равен 65
+        return String.fromCharCode(65 + num);
+    } else {
+        return 'Недопустимый номер';
+    }
+};
+
+export const createButtons = (buttons: ButtonCategory[][]) => {
+    return buttons.map((k) => {
+        return k.map((r) => {
+            return Markup.button.callback(r.text, r.action);
+        });
+    });
 };
