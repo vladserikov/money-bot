@@ -1,3 +1,4 @@
 node_modules
 .env
 src/budget-bot-396806-ae201ac5d68f.json
+.nodemon.json
