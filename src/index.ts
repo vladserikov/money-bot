@@ -52,20 +52,32 @@ bot.action(/expense_(\d+)$/, async (ctx) => {
 });
 
 bot.on(message('reply_to_message'), async (ctx) => {
+    if (!mainKeyboard) {
+        await initButtons();
+    }
     const category = (ctx.message.reply_to_message as { text: string }).text;
     const buttons = createButtons(mainKeyboard);
 
-    const test = category
-        .split(/Категория:|Ячейка:|\n/)
-        .filter((v) => v)
-        .map((v) => v.trim());
+    const regex = /Категория:\s(.*?)\s|Ячейка:\s(.*?)\s/g;
 
-    const currentColumn = test[0];
+    let match,
+        categoryChar,
+        categoryName = '';
+    while ((match = regex.exec(category)) !== null) {
+        if (match[1]) {
+            categoryName = match[1];
+        }
+        if (match[2]) {
+            categoryChar = match[2];
+        }
+    }
+
     const value = (ctx.message as { text: string }).text;
 
-    const { currentValue, newValue } = await updateCell(currentColumn, value);
+    const { currentValue, newValue } = await updateCell(categoryName, value);
+    const endMessage = `Категория: ${categoryName}\nЯчейка: ${categoryChar}\nОтветом на сообщение введите сумму`;
 
-    ctx.reply(`Вы ввели ${newValue}\nТекущее значение ${currentValue}\n${category}`, Markup.inlineKeyboard(buttons));
+    ctx.reply(`Вы ввели ${newValue}\nТекущее значение ${currentValue}\n${endMessage}`, Markup.inlineKeyboard(buttons));
 });
 
 bot.hears('Бюджет', async (ctx) => {

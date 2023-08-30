@@ -24,7 +24,12 @@ export const updateCell = async (columnName: string, newValue: string) => {
 
     if (currentDate === lastRow?.get('Категория')) {
         const cellValue = lastRow.get(columnName);
-        const currentValue = cellValue ? `${Number(cellValue) + Number(newValue)}` : newValue;
+        let currentValue;
+        if (cellValue && Number(cellValue) > 0) {
+            currentValue = cellValue ? `${Number(cellValue) + Number(newValue)}` : newValue;
+        } else {
+            currentValue = newValue;
+        }
         lastRow.set(columnName, currentValue);
         await lastRow.save();
 
