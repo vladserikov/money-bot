@@ -1,9 +1,9 @@
 import { JWT } from 'google-auth-library';
-import fs from 'fs';
+import { aouth } from './config';
 
-const pathToJson = './budget-bot-396806-ae201ac5d68f.json';
-const rawData = fs.readFileSync(pathToJson, 'utf-8');
-export const credentials = JSON.parse(rawData);
+const buffer = Buffer.from(aouth, 'base64');
+
+export const credentials = JSON.parse(buffer.toString('ascii'));
 
 export default new JWT({
     email: credentials.client_email,

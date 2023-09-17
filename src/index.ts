@@ -2,7 +2,7 @@ require('dotenv').config();
 import { Telegraf, Markup } from 'telegraf';
 import { ButtonCategory, createButtons, getButtonsCategory, getCategory, getLetterByNumber } from './utils';
 import { message } from 'telegraf/filters';
-import { getSheet, updateCell } from './docApi';
+import { getDayResult, getSheetByIndex, updateCell } from './docApi';
 import { token } from './config';
 
 let mainKeyboard: ButtonCategory[][];
@@ -24,7 +24,7 @@ bot.command('start', async (ctx) => {
 
 bot.command('new_category', async (ctx) => {
     const currentHeaders = await getCategory();
-    const sheet = await getSheet();
+    const sheet = await getSheetByIndex();
     const nameNewCategory = ctx.message.text.slice(14);
     const newCategoryList = currentHeaders.concat(nameNewCategory);
 
@@ -58,7 +58,7 @@ bot.on(message('reply_to_message'), async (ctx) => {
     const category = (ctx.message.reply_to_message as { text: string }).text;
     const buttons = createButtons(mainKeyboard);
 
-    const regex = /Категория:\s(.*?)\s|Ячейка:\s(.*?)\s/g;
+    const regex = /Категория:\s(.*?)\n|Ячейка:\s(.*?)\n/g;
 
     let match,
         categoryChar,
@@ -92,6 +92,16 @@ bot.hears('События', async (ctx) => {
 
 bot.hears('Ссылки', async (ctx) => {
     await ctx.reply('Пока что умеем только денюжку считать', Markup.keyboard([['Бюджет']]).resize());
+});
+
+bot.hears('Сегодня', async (ctx) => {
+    const result = await getDayResult();
+    console.log(result);
+    if (result.message === 'error') {
+        return ctx.reply('Тараты сегодня ->', Markup.keyboard([['Бюджет']]).resize());
+    }
+
+    ctx.reply(`Тараты сегодня (${result.lastDate}): ${result.result}`, Markup.keyboard([['Бюджет']]).resize());
 });
 
 bot.on(message('text'), async (ctx) => {
