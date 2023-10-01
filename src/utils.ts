@@ -1,5 +1,5 @@
 import { Markup } from 'telegraf';
-import { getSheetByIndex, getSheetByMonth, getSheetByTitle } from './docApi';
+import { getSheetByMonth } from './docApi';
 
 export type ButtonCategory = {
     text: string;

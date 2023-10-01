@@ -2,7 +2,7 @@ require('dotenv').config();
 import { Telegraf, Markup } from 'telegraf';
 import { ButtonCategory, createButtons, getButtonsCategory, getCategory, getLetterByNumber } from './utils';
 import { message } from 'telegraf/filters';
-import { getDayResult, getSheetByIndex, getSheetByTitle, updateCell } from './docApi';
+import { getDayResult, getSheetByMonth, updateCell } from './docApi';
 import { token } from './config';
 
 let mainKeyboard: ButtonCategory[][];
@@ -24,7 +24,7 @@ bot.command('start', async (ctx) => {
 
 bot.command('new_category', async (ctx) => {
     const currentHeaders = await getCategory();
-    const sheet = await getSheetByIndex();
+    const sheet = await getSheetByMonth();
     const nameNewCategory = ctx.message.text.slice(14);
     const newCategoryList = currentHeaders.concat(nameNewCategory);
 
