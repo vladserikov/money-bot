@@ -1,5 +1,5 @@
 import { Markup } from 'telegraf';
-import { getSheetByIndex } from './docApi';
+import { getSheetByIndex, getSheetByMonth, getSheetByTitle } from './docApi';
 
 export type ButtonCategory = {
     text: string;
@@ -7,9 +7,8 @@ export type ButtonCategory = {
 };
 
 export const getCategory = async () => {
-    const sheet = await getSheetByIndex();
+    const sheet = await getSheetByMonth();
     await sheet.loadHeaderRow();
-
     return sheet.headerValues;
 };
 

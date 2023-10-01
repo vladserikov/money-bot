@@ -10,7 +10,20 @@ export const getSheetByIndex = async (index = 0) => {
     return doc.sheetsByIndex[index];
 };
 
-export const getSheet = async (title: string) => {
+export const getSheetByMonth = async () => {
+    await doc.loadInfo();
+    const currentMonth = new Date().toLocaleDateString('ru-RU', { month: 'long' });
+    const sheet = doc.sheetsByTitle[currentMonth];
+    if (sheet) {
+        return sheet;
+    } else {
+        const newSheet = await doc.addSheet();
+        await newSheet.updateProperties({ title: currentMonth });
+        return newSheet;
+    }
+};
+
+export const getSheetByTitle = async (title: string) => {
     await doc.loadInfo();
     return doc.sheetsByTitle[title];
 };
@@ -22,8 +35,7 @@ export const getRows = async () => {
 };
 
 export const getDayResult = async () => {
-    const sheet = await getSheetByIndex();
-    // const currentDate = new Date().toLocaleDateString();
+    const sheet = await getSheetByMonth();
     const rows = await sheet.getRows();
     let lastRow = rows[rows.length - 1];
     if (!lastRow) return { message: 'error' };
@@ -43,9 +55,14 @@ export const getDayResult = async () => {
 };
 
 export const updateCell = async (columnName: string, newValue: string) => {
-    const sheet = await getSheetByIndex();
+    const sheet = await getSheetByMonth();
 
-    const currentDate = new Date().toLocaleDateString();
+    const currentDate = new Date().toLocaleDateString('ru-RU', {
+        year: 'numeric',
+        month: 'numeric',
+        day: 'numeric',
+    });
+
     const rows = await sheet.getRows();
     let lastRow = rows[rows.length - 1];
 

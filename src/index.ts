@@ -2,7 +2,7 @@ require('dotenv').config();
 import { Telegraf, Markup } from 'telegraf';
 import { ButtonCategory, createButtons, getButtonsCategory, getCategory, getLetterByNumber } from './utils';
 import { message } from 'telegraf/filters';
-import { getDayResult, getSheetByIndex, updateCell } from './docApi';
+import { getDayResult, getSheetByIndex, getSheetByTitle, updateCell } from './docApi';
 import { token } from './config';
 
 let mainKeyboard: ButtonCategory[][];
